@@ -1,4 +1,4 @@
-package pl.pjwstk.steps;
+package pl.pjatk.steps;
 
 import io.cucumber.java.en.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
