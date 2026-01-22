@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
 import java.time.Duration;
 
@@ -16,30 +17,34 @@ public class SauceDemoShopTest {
     private WebDriver driver;
 
     @BeforeEach
-    public void setUp() {
-        WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
+    void setUp() {
+        //WebDriverManager.edgedriver().setup();
+
+        EdgeOptions options = new EdgeOptions();
+        options.addArguments("--remote-allow-origins=*");
+
+        // Nie musimy już podawać .setBinary() - Edge jest w standardowej ścieżce Windowsa
+        driver = new EdgeDriver(options);
+
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.manage().window().maximize();
     }
 
     @Test
     public void testAddToCart() {
-        // GIVEN: Użytkownik jest zalogowany (wymagane na tej stronie demo)
         driver.get("https://www.saucedemo.com/");
+
+        // Logowanie
         driver.findElement(By.id("user-name")).sendKeys("standard_user");
         driver.findElement(By.id("password")).sendKeys("secret_sauce");
         driver.findElement(By.id("login-button")).click();
 
-        // WHEN: Dodaje produkt "Backpack" do koszyka
-        WebElement addToCartButton = driver.findElement(By.id("add-to-cart-sauce-labs-backpack"));
-        addToCartButton.click();
+        // Akcja: Dodanie do koszyka
+        driver.findElement(By.id("add-to-cart-sauce-labs-backpack")).click();
 
-        // THEN: Ikona koszyka powinna pokazać 1 przedmiot
+        // Asercja: Czy w koszyku jest 1 przedmiot
         WebElement cartBadge = driver.findElement(By.className("shopping_cart_badge"));
-        String itemsInCart = cartBadge.getText();
-
-        Assertions.assertEquals("1", itemsInCart, "Liczba produktów w koszyku się nie zgadza!");
+        Assertions.assertEquals("1", cartBadge.getText());
     }
 
     @AfterEach
